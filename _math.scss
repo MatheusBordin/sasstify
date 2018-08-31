@@ -1,0 +1,244 @@
+@function sum($value, $diff) {
+  @if type-of($value: $diff) == map {
+      @if type-of($value: $value) == map {
+          $returnMap: map-merge($map1: (), $map2: $value);
+
+          @each $device, $deviceValue in $value {
+              $diff_value: 0;
+              $diff_keys: map-keys($map: $diff);
+              $diff_values: map-values($map: $diff);
+
+              @for $i from 1 through length($diff_keys) {
+                  $curr_key: nth($list: $diff_keys, $n: $i);
+                  $curr_value: nth($list: $diff_values, $n: $i);
+
+                  @if $curr_key == default {
+                      $diff_value: $curr_value;
+                  }
+                  @else if $device != default {
+                      $curr_bp_value: map-get($map: $breakpoints, $key: $curr_key);
+                      $device_bp_value: map-get($map: $breakpoints, $key: $device);
+
+                      @if $curr_bp_value <= $device_bp_value {
+                          $diff_value: $curr_value;
+                      }
+                  }
+              }
+
+              $curr: ($device: calc(#{$deviceValue} + #{$diff_value}));
+              $returnMap: map-merge($map1: $returnMap, $map2: $curr);
+          }
+
+          @return $returnMap;
+      }
+      @else {
+          $returnMap: map-merge($map1: (), $map2: $diff);
+
+          @each $device, $deviceDiff in $diff {
+              $curr: ($device: calc(#{$deviceDiff} + #{$value}));
+              $returnMap: map-merge($map1: $returnMap, $map2: $curr);
+          }
+
+          @return $returnMap;
+      }
+  }
+  @else {
+      @if type-of($value: $value) == map {
+          $returnMap: map-merge($map1: (), $map2: $value);
+
+          @each $device, $deviceValue in $value {
+              $curr: ($device: calc(#{$deviceValue} + #{$diff}));
+              $returnMap: map-merge($map1: $returnMap, $map2: $curr);
+          }
+
+          @return $returnMap;
+      }
+      @else {
+          @return calc(#{$value} + #{$diff});
+      }
+  }
+}
+
+@function subtract($value, $diff) {
+  @if type-of($value: $diff) == map {
+    @if type-of($value: $value) == map {
+        $returnMap: map-merge($map1: (), $map2: $value);
+
+        @each $device, $deviceValue in $value {
+            $diff_value: 0;
+            $diff_keys: map-keys($map: $diff);
+            $diff_values: map-values($map: $diff);
+
+            @for $i from 1 through length($diff_keys) {
+                $curr_key: nth($list: $diff_keys, $n: $i);
+                $curr_value: nth($list: $diff_values, $n: $i);
+
+                @if $curr_key == default {
+                    $diff_value: $curr_value;
+                }
+                @else if $device != default {
+                    $curr_bp_value: map-get($map: $breakpoints, $key: $curr_key);
+                    $device_bp_value: map-get($map: $breakpoints, $key: $device);
+
+                    @if $curr_bp_value <= $device_bp_value {
+                        $diff_value: $curr_value;
+                    }
+                }
+            }
+
+            $curr: ($device: calc(#{$deviceValue} - #{$diff_value}));
+            $returnMap: map-merge($map1: $returnMap, $map2: $curr);
+        }
+
+        @return $returnMap;
+    }
+    @else {
+        $returnMap: map-merge($map1: (), $map2: $diff);
+
+        @each $device, $deviceDiff in $diff {
+            $curr: ($device: calc(#{$value} - #{$deviceDiff}));
+            $returnMap: map-merge($map1: $returnMap, $map2: $curr);
+        }
+
+        @return $returnMap;
+    }
+  }
+  @else {
+      @if type-of($value: $value) == map {
+          $returnMap: map-merge($map1: (), $map2: $value);
+
+
+          @each $device, $deviceValue in $value {
+              $curr: ($device: calc(#{$deviceValue} - #{$diff}));
+              $returnMap: map-merge($map1: $returnMap, $map2: $curr);
+          }
+
+          @return $returnMap;
+      }
+      @else {
+          @return calc(#{$value} - #{$diff});
+      }
+  }
+}
+
+@function multiply($value, $diff) {
+  @if type-of($value: $diff) == map {
+    @if type-of($value: $value) == map {
+        $returnMap: map-merge($map1: (), $map2: $value);
+
+        @each $device, $deviceValue in $value {
+            $diff_value: 0;
+            $diff_keys: map-keys($map: $diff);
+            $diff_values: map-values($map: $diff);
+
+            @for $i from 1 through length($diff_keys) {
+                $curr_key: nth($list: $diff_keys, $n: $i);
+                $curr_value: nth($list: $diff_values, $n: $i);
+
+                @if $curr_key == default {
+                    $diff_value: $curr_value;
+                }
+                @else if $device != default {
+                    $curr_bp_value: map-get($map: $breakpoints, $key: $curr_key);
+                    $device_bp_value: map-get($map: $breakpoints, $key: $device);
+
+                    @if $curr_bp_value <= $device_bp_value {
+                        $diff_value: $curr_value;
+                    }
+                }
+            }
+
+            $curr: ($device: calc(#{$deviceValue} * #{$diff_value}));
+            $returnMap: map-merge($map1: $returnMap, $map2: $curr);
+        }
+
+        @return $returnMap;
+    }
+    @else {
+        $returnMap: map-merge($map1: (), $map2: $diff);
+
+        @each $device, $deviceDiff in $diff {
+            $curr: ($device: calc(#{$deviceDiff} * #{$value}));
+            $returnMap: map-merge($map1: $returnMap, $map2: $curr);
+        }
+
+        @return $returnMap;
+    }
+  }
+  @else {
+      @if type-of($value: $value) == map {
+          $returnMap: map-merge($map1: (), $map2: $value);
+
+          @each $device, $deviceValue in $value {
+              $curr: ($device: calc(#{$deviceValue} * #{$diff}));
+              $returnMap: map-merge($map1: $returnMap, $map2: $curr);
+          }
+
+          @return $returnMap;
+      }
+      @else {
+          @return calc(#{$value} * #{$diff});
+      }
+  }
+}
+
+@function division($value, $diff) {
+  @if type-of($value: $diff) == map {
+    @if type-of($value: $value) == map {
+        $returnMap: map-merge($map1: (), $map2: $value);
+
+        @each $device, $deviceValue in $value {
+            $diff_value: 0;
+            $diff_keys: map-keys($map: $diff);
+            $diff_values: map-values($map: $diff);
+
+            @for $i from 1 through length($diff_keys) {
+                $curr_key: nth($list: $diff_keys, $n: $i);
+                $curr_value: nth($list: $diff_values, $n: $i);
+
+                @if $curr_key == default {
+                    $diff_value: $curr_value;
+                }
+                @else if $device != default {
+                    $curr_bp_value: map-get($map: $breakpoints, $key: $curr_key);
+                    $device_bp_value: map-get($map: $breakpoints, $key: $device);
+
+                    @if $curr_bp_value <= $device_bp_value {
+                        $diff_value: $curr_value;
+                    }
+                }
+            }
+
+            $curr: ($device: calc(#{$deviceValue} / #{$diff_value}));
+            $returnMap: map-merge($map1: $returnMap, $map2: $curr);
+        }
+
+        @return $returnMap;
+    }
+    @else {
+        $returnMap: map-merge($map1: (), $map2: $diff);
+
+        @each $device, $deviceDiff in $diff {
+            $curr: ($device: calc(#{$deviceDiff} / #{$value}));
+            $returnMap: map-merge($map1: $returnMap, $map2: $curr);
+        }
+
+        @return $returnMap;
+    }
+  }
+  @else {
+      @if type-of($value: $value) == map {
+          $returnMap: map-merge($map1: (), $map2: $value);
+
+          @each $device, $deviceValue in $value {
+              $curr: ($device: calc(#{$deviceValue} / #{$diff}));
+              $returnMap: map-merge($map1: $returnMap, $map2: $curr);
+          }
+
+          @return $returnMap;
+      }
+      @else {
+          @return calc(#{$value} / #{$diff});
+      }
+  }
+}

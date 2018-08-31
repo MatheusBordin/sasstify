@@ -1,0 +1,132 @@
+
+@mixin widthBy($width) {
+    @if type-of($value: $width) == map {
+        @include widthByMap($width);
+    }
+    @else if type-of($value: $width) == number {
+        @include widthByNumber($width);
+    }
+    @else {
+        @error "mixin 'widthBy': Expected type map or number in parameter 'width'";
+    }
+}
+
+@mixin widthByCount($count, $gutter: 0) {
+    @if type-of($value: $count) == number {
+        @include widthByCountItem($count, $gutter);
+    }
+    @else if type-of($value: $count) == map {
+        $range_keys: map-keys($map: $count);
+        $range_values: map-values($map: $count);
+        @for $i from 1 through length($range_keys) {
+
+            @if $i != length($list: $range_keys) {
+                $currKey: nth($range_keys, $i);
+                $currValue: nth($range_values, $i);
+                $nextKey: nth($range_keys, $i + 1);
+
+                $currBreakValue: map-get($map: $breakpoints, $key: $currKey);
+                $nextBreakValue: map-get($map: $breakpoints, $key: $nextKey);
+
+                @media only screen and (min-width: $currBreakValue) and (max-width: $nextBreakValue - 1) {
+                    @include widthByCountItem($currValue, $gutter);
+                }
+
+            } @else {
+                $currKey: nth($range_keys, $i);
+                $currValue: nth($range_values, $i);
+                $currBreakValue: map-get($map: $breakpoints, $key: $currKey);
+
+                @media only screen and (min-width: $currBreakValue) {
+                    @include widthByCountItem($currValue, $gutter);
+                }
+            }
+
+        }
+    }
+    @else {
+        @error "mixin 'widthByCount': Expected type map or number in parameter 'count'";
+    }
+}
+
+@mixin widthByCountItem($count, $gutter: 0) {
+
+    @if type-of($value: $gutter) == number {
+        $gutterItem: $gutter / 2;
+        $width: calc((100% - (#{$count} - 1) * #{$gutter}) / #{$count});
+
+        display: inline-block;
+        width: $width;
+        margin-right: $gutterItem;
+        margin-left: $gutterItem;
+
+        &:nth-of-type(#{$count}n + #{$count}) {
+            margin-right: 0;
+        }
+
+        &:nth-of-type(#{$count}n + 1) {
+            margin-left: 0;
+        }
+    }
+    @else if type-of($value: $gutter) == map {
+        @each $device, $deviceGutter in $gutter {
+            @include mediaTo($device) {
+                @include widthByCountItem($count, $deviceGutter);
+            }
+        }
+    }
+    @else {
+        @error "mixin 'widthByCount': Expected type map or number in parameter 'gutter'";
+    }
+
+}
+
+@mixin widthByMap($width) {
+    width: 100%;
+
+    @each $device, $deviceWidth in $width {
+        @include mediaTo($device) {
+            max-width: $deviceWidth;
+        }
+    }
+}
+
+@mixin widthByNumber($width) {
+    width: $width;
+}
+
+@function contains($list, $var) {
+  $_out: false;
+
+  @each $item in $list {
+    @if $item == $var {
+      $_out: true;
+    }
+  }
+
+  @return $_out;
+}
+
+@function getValueOrDefault($key, $map, $default: 0) {
+  $availableKeys: ();
+  $finishLoop: false;
+
+  @each $device, $deviceValue in $breakpoints {
+    @if not $finishLoop {
+      $availableKeys: append($availableKeys, $device, comma);
+    }
+
+    @if $device == $key {
+      $finishLoop: true;
+    }
+  }
+
+  $result: $default;
+  @each $key, $value in $map {
+    @if contains($availableKeys, $key) {
+      $result: $value;
+    }
+  }
+
+  @return $result;
+}
